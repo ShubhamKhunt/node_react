@@ -1,0 +1,2 @@
+- Ingore to add seperate route for each module if "Auto Route" configuration enabled in Config/Parameter.js, It will automatically create route based on exported methods in every module controller will be considered as route and will be work for both get and post
+- Make Route same as which are exported methods in every controller to avoid Route not Found Exception if API released and Auto config chaned meanwhile

@@ -4,6 +4,8 @@ const validator = require('validator');
 const Base = require('./base')
 // const UserModel = require('../models/user');
 
+const JWT = require('../lib/JWT/Controller/JWT');
+
 class User extends Base{
 	constructor(req, res){
 		// bind req and res with this
@@ -13,6 +15,8 @@ class User extends Base{
 	async getUserList(){
 
 		try{
+			console.log(this.req.cookies);
+
 			let data = await this.UserService.getUserList();
 			this.res.send({
 				success: (data.code) ? false : true,
@@ -39,6 +43,28 @@ class User extends Base{
 				err: e
 			});
 		}
+	}
+
+	getUser(){
+
+		this.res.send({
+			success: true,
+			data: {
+				authorization: JWT.getToken()
+			}
+		});
+	}
+
+	getToken(){
+
+		this.res.cookie('custom_cookie_param', 'THIS_IS_ID')
+
+		this.res.send({
+			success: true,
+			data: {
+				authorization: '121c31c1sd3c1sd318fger8ger98g45gr45g44er54'
+			}
+		});
 	}
 
 	// static setObject(req, res){
@@ -77,7 +103,12 @@ exports.getUserList = (req, res) => {
 }
 
 exports.getUser = (req, res) => {
-	// console.log(req.dbConn);
-	user = User.getObject(req, res)
+	let user = new User(req, res);
 	user.getUser();
+}
+
+// temporory
+exports.getToken = (req, res) => {
+	let user = new User(req, res);
+	user.getToken();
 }

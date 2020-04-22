@@ -23,7 +23,7 @@ class Base{
 		// this[Error] = require(path.join(__dirname, '../lib/Error/Controller/Error.js'));
 	}
 
-	awaiter(exec){
+	wireUp(exec){
 		return new Promise((resolve, reject) => {
 			function fn(result, err){
 				if(err){

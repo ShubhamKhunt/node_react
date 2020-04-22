@@ -10,7 +10,7 @@ class User extends Base{
 
 	// save user
 	save(){
-		return this.awaiter((fn) => {
+		return this.wireUp((fn) => {
 			this.UserModel.create(this.req.body, function(err, result){
 				if (err) {
 					fn(false, err); return;
@@ -23,16 +23,14 @@ class User extends Base{
 	
 	// get user list
 	getUserList(){
-		return this.awaiter((fn) => {
+		return this.wireUp((fn) => {
 			this.UserModel.find({"active": true})
 			.select('_id firstname lastname username')
 			.exec(function(err, result){
 				if (err) {
 					fn(false, err); return;
 				}
-
-				console.log(result)
-
+				
 				fn(result, false); return;
 			})
 		})

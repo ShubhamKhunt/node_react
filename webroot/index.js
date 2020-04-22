@@ -1,8 +1,10 @@
 const express = require('express');
+const cookieParser = require('cookie-parser')
 const config = require('../config/parameters');
 
 const fs = require('fs');
 const path = require('path');
+const open = require('open');
 
 const bodyParser = require('body-parser')
 
@@ -36,15 +38,52 @@ class Webroot{
 			try{
 				// access json body
 				this.app.use(bodyParser.json());
+				this.app.use(cookieParser());
 				
-				// require('../routes/user.js')(this.app);
-				fs.readdirSync(path.join(__dirname, '../routes')).map(file => {
+				if(config.routeConfig.autoRoute){
+					let app = this.app;
+					let router = this.router;
 
-					// load module and sub module routes
-					require('../routes/' + file)(this.app, this.router, this.connection);
+					// generate router based on controller
+					let controllerPath = path.join(__dirname, '../controllers')
+					fs.readdirSync(controllerPath).map(file => {
 
-					resolve(true);
-				});
+						// no need to add base as a route
+						if(file != 'base.js'){
+							const lineReader = require('line-reader');
+
+							// load controller file
+							const controller = require(controllerPath +'/'+ file);
+
+							lineReader.eachLine(controllerPath +'/'+ file, function(line) {
+								// router name will be what param used in export in each controller file
+								if(line.startsWith('exports')){
+									let str = line;
+									str = str.split('=');
+									if(str.length > 0){
+										str = str[0].trim();
+										str = str.replace('exports.', '')
+
+										// route forcefully available in get and post both
+										router.all(`${config.app_prefix}/${str}`, controller[str]);
+									}
+								}
+							});
+
+							app.use(router);
+							resolve(true);
+						}
+					});	
+				} else {
+					// read routes from route files
+					fs.readdirSync(path.join(__dirname, '../routes')).map(file => {
+
+						// load module and sub module routes
+						require('../routes/' + file)(this.app, this.router, this.connection);
+
+						resolve(true);
+					});	
+				}
 			} catch(err){
 				reject(err)
 			}
@@ -82,6 +121,7 @@ class Webroot{
 			}
 
 			console.log(`server is ready`);
+			// open('http://localhost:3001/');
 		});
 	}
 }

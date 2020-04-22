@@ -10,7 +10,7 @@ class Category extends Base{
 
 	// save user
 	save(){
-		return this.awaiter((fn) => {
+		return this.wireUp((fn) => {
 			this.CategoryModel.create(this.req.body, function(err, result){
 				if (err) {
 					fn(false, err); return;
@@ -23,15 +23,13 @@ class Category extends Base{
 	
 	// get category list
 	getList(){
-		return this.awaiter((fn) => {
+		return this.wireUp((fn) => {
 			this.CategoryModel.find({"active": true})
 			.select('_id name description image')
 			.exec(function(err, result){
 				if (err) {
 					fn(false, err); return;
 				}
-
-				console.log(result)
 
 				fn(result, false); return;
 			})

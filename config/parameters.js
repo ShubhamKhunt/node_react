@@ -14,5 +14,8 @@ module.exports = {
 		uri: `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
 	},
 	app_prefix: `/${process.env.API_PREFIX}/${current_version}`,
-	current_version: current_version
+	current_version: current_version,
+	routeConfig: {
+		autoRoute: true // define routes which are named in export method in each controller file
+	}
 };
