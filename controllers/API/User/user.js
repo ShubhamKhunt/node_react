@@ -48,12 +48,31 @@ router.all('/getToken', (req, res) => {
 // save User
 router.all('/saveUser', (req, res) => {
 
+  const auth = req.header('Authorization') || ''
+  
+  if(!auth || auth === ''){
+    res.send({
+      status: false
+    });
+  }
+
+  // verify token
+  const _payload = Auth.getPayload(auth)
+
+  if(!_payload || Object.keys(_payload).length === 0){
+    res.send({
+      status: false
+    });
+  }
+
+  const { firstname, lastname, username, password, dob } = req.body
+
   let payLoad = {
-    firstname: 'Test',
-    lastname: 'JS',
-    username: 'test.js',
-    password: '123456',
-    dob: '2020-03-13'
+    firstname: firstname,
+    lastname: lastname,
+    username: username,
+    password: password,
+    dob: dob
   };
 
   // create object
@@ -63,14 +82,12 @@ router.all('/saveUser', (req, res) => {
   // save user
   loadUser.save();
 
-  const token = Auth.getToken(payLoad);
-
-  console.log(token);
+  // const token = Auth.getToken(payLoad);
 
   res.send({
     status: true,
     data: {
-      auth: token,
+      // auth: token,
       user: payLoad
     }
   });

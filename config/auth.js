@@ -5,14 +5,19 @@ const jwt = require('jsonwebtoken');
 const privateKeyPath = path.join(__dirname, './key/private.pem');
 const publicKeyPath = path.join(__dirname, './key/public.pem');
 
+// const privateKeyPath = "./key/private.pem";
+// const publicKeyPath = "./key/public.pem";
+
 const privateKey = fs.readFileSync(privateKeyPath);
 const publicKey = fs.readFileSync(publicKeyPath);
+
+console.log(publicKey)
 
 class Auth {
 
     constructor(){
         this.configuration = {
-            algorithm: 'RS256',
+            algorithm: 'HS512',
             passPhrase: 'Backend@123',
             privateKey: privateKey,
             publicKey: publicKey
@@ -20,10 +25,7 @@ class Auth {
     }
 
     getToken = (payLoad) => {
-        const token = jwt.sign(payLoad, { 
-                key: this.configuration.privateKey, 
-                passphrase: this.configuration.passPhrase 
-            }, 
+        const token = jwt.sign(payLoad, this.configuration.privateKey, 
             { algorithm: this.configuration.algorithm },
             { expiresIn: '1h' },
             function(err, res){
@@ -32,11 +34,14 @@ class Auth {
             }
         );
 
+        // const token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+
         return token;
     }
 
     getPayload = (token) => {
-        var payLoad = jwt.verify(token, this.configuration.publicKey, { algorithms: [this.configuration.algorithm] }, function (err, payload) {
+        var payLoad = jwt.verify(token, privateKey, { algorithms: ['HS512'] }, function (err, payload) {
+            console.log('payload err :: ', err)
             return payload;
         });
 
